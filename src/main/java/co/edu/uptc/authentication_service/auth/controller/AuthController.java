@@ -31,6 +31,15 @@
         ) {
             return service.refreshToken(authentication);
         }
+        @PostMapping("/logout")
+        public ResponseEntity<String> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authentication) {
+            try {
+                service.logout(authentication);
+                return ResponseEntity.ok("Sesión cerrada correctamente.");
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Error al cerrar sesión: " + e.getMessage());
+            }
+        }
 
 
     }

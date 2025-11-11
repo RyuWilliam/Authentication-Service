@@ -6,6 +6,10 @@ public record TokenResponse(
         @JsonProperty("access_token")
         String accessToken,
         @JsonProperty("refresh_token")
-        String refreshToken
+        String refreshToken,
+        @JsonProperty("user_id")
+        Integer userId,
+        @JsonProperty("user_name")
+        String userName
 ) {
 }

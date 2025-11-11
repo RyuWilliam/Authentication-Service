@@ -38,7 +38,7 @@ public class AuthService {
         final String refreshToken = jwtService.generateRefreshToken(savedUser);
 
         saveUserToken(savedUser, jwtToken);
-        return new TokenResponse(jwtToken, refreshToken);
+        return new TokenResponse(jwtToken, refreshToken, user.getId(), user.getName());
     }
 
     public TokenResponse authenticate(final AuthRequest request) {
@@ -54,7 +54,7 @@ public class AuthService {
         final String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName() );
     }
 
     private void saveUserToken(User user, String jwtToken) {
@@ -66,6 +66,23 @@ public class AuthService {
                 .isRevoked(false)
                 .build();
         tokenRepository.save(token);
+    }
+    public void logout(String authentication) {
+        if (authentication == null || !authentication.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid authorization header");
+        }
+
+        String token = authentication.substring(7);
+        String userEmail = jwtService.extractUsername(token);
+
+        if (userEmail == null) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+
+        User user = repository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        revokeAllUserTokens(user);
     }
 
     private void revokeAllUserTokens(final User user) {
@@ -100,6 +117,6 @@ public class AuthService {
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
 
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName());
     }
 }
