@@ -40,7 +40,7 @@ public class JwtService {
     private String buildToken(final User user, final long expiration) {
         return Jwts
                 .builder()
-                .claims(Map.of("name", user.getName()))
+                .claims(Map.of("name", user.getName(), "role", user.getRole()))
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
@@ -48,6 +48,14 @@ public class JwtService {
                 .compact();
     }
 
+    public <T> T extractClaim(String token, String claim, Class<T> type) {
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get(claim, type);
+    }
     public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
         return (username.equals(user.getEmail())) && !isTokenExpired(token);

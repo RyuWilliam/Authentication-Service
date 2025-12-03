@@ -4,6 +4,7 @@ package co.edu.uptc.authentication_service.service;
 import co.edu.uptc.authentication_service.auth.controller.AuthRequest;
 import co.edu.uptc.authentication_service.auth.controller.RegisterRequest;
 import co.edu.uptc.authentication_service.auth.controller.TokenResponse;
+import co.edu.uptc.authentication_service.persistence.entity.Role;
 import co.edu.uptc.authentication_service.persistence.entity.Token;
 import co.edu.uptc.authentication_service.persistence.entity.User;
 import co.edu.uptc.authentication_service.persistence.repository.TokenRepository;
@@ -30,6 +31,7 @@ public class AuthService {
         final User user = User.builder()
                 .name(request.name())
                 .email(request.email())
+                .role(Role.SELLER)
                 .password(passwordEncoder.encode(request.password()))
                 .build();
 
@@ -38,7 +40,7 @@ public class AuthService {
         final String refreshToken = jwtService.generateRefreshToken(savedUser);
 
         saveUserToken(savedUser, jwtToken);
-        return new TokenResponse(jwtToken, refreshToken, user.getId(), user.getName());
+        return new TokenResponse(jwtToken, refreshToken, user.getId(), user.getName(), user.getRole());
     }
 
     public TokenResponse authenticate(final AuthRequest request) {
@@ -54,7 +56,7 @@ public class AuthService {
         final String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
-        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName() );
+        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName(), user.getRole() );
     }
 
     private void saveUserToken(User user, String jwtToken) {
@@ -117,6 +119,6 @@ public class AuthService {
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
 
-        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName());
+        return new TokenResponse(accessToken, refreshToken, user.getId(), user.getName(), user.getRole());
     }
 }

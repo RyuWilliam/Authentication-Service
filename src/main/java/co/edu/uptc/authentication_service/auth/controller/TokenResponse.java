@@ -1,5 +1,6 @@
 package co.edu.uptc.authentication_service.auth.controller;
 
+import co.edu.uptc.authentication_service.persistence.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record TokenResponse(
@@ -10,6 +11,8 @@ public record TokenResponse(
         @JsonProperty("user_id")
         Integer userId,
         @JsonProperty("user_name")
-        String userName
+        String userName,
+        @JsonProperty("role")
+        Role role
 ) {
 }
