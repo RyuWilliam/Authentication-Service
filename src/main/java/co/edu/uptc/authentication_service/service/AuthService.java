@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -25,16 +26,19 @@ public class AuthService {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RestTemplate restTemplate;
     private final AuthenticationManager authenticationManager;
 
     public TokenResponse register(final RegisterRequest request) {
         final User user = User.builder()
                 .name(request.name())
                 .email(request.email())
-                .role(Role.SELLER)
+                .phone(request.phone())
+                .role(Role.CONSUMER)
                 .password(passwordEncoder.encode(request.password()))
                 .build();
 
+        restTemplate.postForObject("http://COLONIALSERVICE/colonial/api/users/save", user, User.class );
         final User savedUser = repository.save(user);
         final String jwtToken = jwtService.generateToken(savedUser);
         final String refreshToken = jwtService.generateRefreshToken(savedUser);

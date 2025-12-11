@@ -17,11 +17,14 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String phone;
 
     @Column(nullable = false, unique = true)
     private String email;
